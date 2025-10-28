@@ -1,0 +1,175 @@
+/* === FOCUSFLOW: COSMIC PURPLE THEME === */
+:root {
+  --bg-gradient: radial-gradient(circle at 20% 20%, #1a052d 0%, #0c011a 30%, #000010 90%);
+  --accent-purple: #9b5de5;
+  --accent-pink: #f15bb5;
+  --accent-blue: #00bbf9;
+  --text-primary: #e0d7ff;
+  --text-secondary: #a48fff;
+  --card-bg: rgba(35, 10, 65, 0.55);
+  --border-glow: 0 0 12px rgba(155, 93, 229, 0.5);
+}
+
+/* === GLOBAL BODY === */
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-gradient);
+  color: var(--text-primary);
+  font-family: "Poppins", sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* === STARFIELD BACKGROUND === */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(2px 2px at 20% 30%, #ffffff 40%, transparent 41%),
+    radial-gradient(1px 1px at 70% 80%, #ffffff 30%, transparent 31%),
+    radial-gradient(1.5px 1.5px at 50% 10%, #ffffff 40%, transparent 41%),
+    radial-gradient(1.2px 1.2px at 90% 50%, #ffffff 40%, transparent 41%);
+  background-repeat: repeat;
+  opacity: 0.25;
+  z-index: 0;
+  animation: starShift 120s linear infinite;
+}
+
+@keyframes starShift {
+  from { background-position: 0 0, 0 0, 0 0, 0 0; }
+  to { background-position: 10000px 5000px, -5000px 10000px, 8000px -3000px, -3000px -8000px; }
+}
+
+/* === LAYOUT CONTAINERS === */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* === GLASS EFFECT CARD === */
+.card {
+  background: var(--card-bg);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  box-shadow: var(--border-glow);
+  padding: 40px;
+  max-width: 400px;
+  width: 90%;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 0 20px rgba(241, 91, 181, 0.3);
+}
+
+/* === HEADINGS === */
+h1 {
+  color: var(--accent-purple);
+  font-size: 2rem;
+  margin-bottom: 20px;
+  text-shadow: 0 0 12px rgba(155, 93, 229, 0.4);
+}
+
+p {
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+/* === INPUT FIELDS === */
+input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 8px rgba(155, 93, 229, 0.5);
+}
+
+/* === BUTTONS === */
+button {
+  width: 100%;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: white;
+  background: linear-gradient(90deg, var(--accent-purple), var(--accent-pink));
+  box-shadow: 0 0 10px rgba(155, 93, 229, 0.4);
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(241, 91, 181, 0.6);
+}
+
+/* === DASHBOARD === */
+.dashboard {
+  background: radial-gradient(circle at 50% 20%, #22003e 0%, #120025 50%, #050012 100%);
+  min-height: 100vh;
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* === COSMIC GLOW EFFECT === */
+.dashboard::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 60% 30%, rgba(155, 93, 229, 0.15), transparent 70%),
+              radial-gradient(ellipse at 30% 70%, rgba(241, 91, 181, 0.1), transparent 70%);
+  animation: nebula 18s ease-in-out infinite alternate;
+  z-index: 0;
+}
+
+@keyframes nebula {
+  0% { transform: scale(1) translate(0, 0); opacity: 0.8; }
+  100% { transform: scale(1.2) translate(-20px, 10px); opacity: 1; }
+}
+
+/* === LOGOUT BUTTON === */
+.logout-btn {
+  background: linear-gradient(90deg, var(--accent-pink), var(--accent-blue));
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0, 187, 249, 0.3);
+  transition: 0.3s;
+  margin-top: 20px;
+  z-index: 2;
+}
+
+.logout-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(0, 187, 249, 0.6);
+}
