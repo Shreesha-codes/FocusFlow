@@ -1,68 +1,71 @@
-import { useState, useEffect } from "react";
-import axios from "../api/axios";
+import React, { useEffect, useState } from "react";
+import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
-import "./Tasks.css";
 
-export default function Tasks() {
+export default function Tasks(){
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState("");
-  const token = localStorage.getItem("token");
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+
+  useEffect(()=> {
+    if (!token) { navigate("/login"); return; }
+    fetchTasks();
+    // eslint-disable-next-line
+  }, []);
 
   const fetchTasks = async () => {
     try {
-      const res = await axios.get("/tasks", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get("/tasks", { headers: { Authorization: `Bearer ${token}` }});
       setTasks(res.data);
-    } catch {
-      navigate("/");
+    } catch (err) {
+      console.error(err);
+      navigate("/login");
     }
   };
 
-  useEffect(() => {
-    fetchTasks();
-  }, []);
-
   const addTask = async (e) => {
     e.preventDefault();
-    await axios.post("/tasks", { title }, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    if (!title.trim()) return;
+    await api.post("/tasks", { title }, { headers: { Authorization: `Bearer ${token}` }});
     setTitle("");
     fetchTasks();
   };
 
-  const deleteTask = async (id) => {
-    await axios.delete(`/tasks/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  const toggle = async (t) => {
+    await api.put(`/tasks/${t._id}`, { isCompleted: !t.isCompleted }, { headers: { Authorization: `Bearer ${token}` }});
     fetchTasks();
   };
 
-  const toggleComplete = async (id, isCompleted) => {
-    await axios.put(`/tasks/${id}`, { isCompleted: !isCompleted }, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  const remove = async (id) => {
+    await api.delete(`/tasks/${id}`, { headers: { Authorization: `Bearer ${token}` }});
     fetchTasks();
   };
 
   return (
     <div className="tasks-container">
-      <h1>My Tasks 🪐</h1>
-      <form onSubmit={addTask}>
-        <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Add new task..." />
-        <button type="submit">Add</button>
-      </form>
+      <div className="card">
+        <h1>🪐 My Tasks</h1>
+        <form onSubmit={addTask} style={{display:"flex",gap:8,marginTop:12}}>
+          <input value={title} placeholder="New task..." onChange={e=>setTitle(e.target.value)} />
+          <button type="submit">Add</button>
+        </form>
 
-      <ul>
-        {tasks.map((task) => (
-          <li key={task._id} className={task.isCompleted ? "completed" : ""}>
-            <span onClick={() => toggleComplete(task._id, task.isCompleted)}>{task.title}</span>
-            <button onClick={() => deleteTask(task._id)}>❌</button>
-          </li>
-        ))}
-      </ul>
+        <ul style={{listStyle:"none",padding:0,marginTop:16}}>
+          {tasks.length === 0 && <p className="muted">No tasks yet — add one!</p>}
+          {tasks.map(t => (
+            <li key={t._id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:10,marginBottom:8,background:"rgba(255,255,255,0.04)",borderRadius:8}}>
+              <span style={{cursor:"pointer",textDecoration: t.isCompleted ? "line-through" : "none"}} onClick={()=>toggle(t)}>
+                {t.title}
+              </span>
+              <div style={{display:"flex",gap:8}}>
+                <button onClick={()=>toggle(t)} style={{padding:"6px 8px"}}>{t.isCompleted ? "Undo" : "Done"}</button>
+                <button onClick={()=>remove(t._id)} style={{padding:"6px 8px"}}>Delete</button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

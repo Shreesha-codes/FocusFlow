@@ -1,39 +1,34 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "../api/axios";
+import api from "../api/axios";
 
-export default function Login() {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+export default function Login(){
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
+  const submit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("/auth/login", formData);
+      const res = await api.post("/auth/login", { email, password });
       localStorage.setItem("token", res.data.token);
       navigate("/dashboard");
-    } catch {
-      alert("Invalid email or password!");
+    } catch (err) {
+      alert(err.response?.data?.message || "Login failed");
     }
   };
 
   return (
     <div className="container">
       <div className="card">
-        <h1>🔭 FocusFlow Login</h1>
-        <form onSubmit={handleSubmit}>
-          <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
-          <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
+        <h1>🔭 FocusFlow</h1>
+        <p className="muted">Login to continue</p>
+        <form onSubmit={submit}>
+          <input name="email" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} required />
+          <input type="password" name="password" placeholder="Password" value={password} onChange={e=>setPassword(e.target.value)} required />
           <button type="submit">Login</button>
         </form>
-        <p>
-          Don’t have an account?{" "}
-          <Link to="/register" style={{ color: "#9b5de5" }}>Register</Link>
-        </p>
+        <p className="muted">New here? <Link to="/register">Create account</Link></p>
       </div>
     </div>
   );

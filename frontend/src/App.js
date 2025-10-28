@@ -3,40 +3,19 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
-import "./App.css";
+import Tasks from "./pages/Tasks";
 
-function App() {
-  const isAuthenticated = !!localStorage.getItem("token");
-
+export default function App(){
+  const token = localStorage.getItem("token");
   return (
     <Router>
       <Routes>
-        {/* Default route: If logged in → Dashboard, else → Login */}
-        <Route
-          path="/"
-          element={isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" />}
-        />
-
-        {/* Login Page */}
-        <Route
-          path="/login"
-          element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />}
-        />
-
-        {/* Register Page */}
-        <Route
-          path="/register"
-          element={isAuthenticated ? <Navigate to="/dashboard" /> : <Register />}
-        />
-
-        {/* Dashboard Page (Protected) */}
-        <Route
-          path="/dashboard"
-          element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
-        />
+        <Route path="/" element={!token ? <Navigate to="/login" /> : <Navigate to="/dashboard" />} />
+        <Route path="/login" element={!token ? <Login /> : <Navigate to="/dashboard" />} />
+        <Route path="/register" element={!token ? <Register /> : <Navigate to="/dashboard" />} />
+        <Route path="/dashboard" element={token ? <Dashboard /> : <Navigate to="/login" />} />
+        <Route path="/tasks" element={token ? <Tasks /> : <Navigate to="/login" />} />
       </Routes>
     </Router>
   );
 }
-
-export default App;
