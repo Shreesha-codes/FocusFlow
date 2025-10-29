@@ -1,29 +1,51 @@
 import Task from "../models/Task.js";
 
-// Create Task
+// GET /api/tasks
+export const getTasks = async (req, res) => {
+  try {
+    const tasks = await Task.find({ user: req.user._id }).sort({ createdAt: -1 });
+    res.json(tasks);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// POST /api/tasks
 export const createTask = async (req, res) => {
   try {
-    const task = await Task.create({ ...req.body, user: req.user.id });
+    const { title, description } = req.body;
+    const task = await Task.create({ user: req.user._id, title, description });
     res.status(201).json(task);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 };
 
-// Get All Tasks
-export const getTasks = async (req, res) => {
-  const tasks = await Task.find({ user: req.user.id });
-  res.json(tasks);
-};
-
-// Update Task
+// PUT /api/tasks/:id
 export const updateTask = async (req, res) => {
-  const task = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  res.json(task);
+  try {
+    const task = await Task.findById(req.params.id);
+    if (!task || task.user.toString() !== req.user._id.toString()) return res.status(404).json({ message: "Not found" });
+
+    task.title = req.body.title ?? task.title;
+    task.description = req.body.description ?? task.description;
+    if (typeof req.body.isCompleted === "boolean") task.isCompleted = req.body.isCompleted;
+
+    const updated = await task.save();
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 
-// Delete Task
+// DELETE /api/tasks/:id
 export const deleteTask = async (req, res) => {
-  await Task.findByIdAndDelete(req.params.id);
-  res.json({ message: "Task deleted" });
+  try {
+    const task = await Task.findById(req.params.id);
+    if (!task || task.user.toString() !== req.user._id.toString()) return res.status(404).json({ message: "Not found" });
+    await task.deleteOne();
+    res.json({ message: "Deleted" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };

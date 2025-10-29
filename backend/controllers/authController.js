@@ -1,50 +1,36 @@
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
-};
+const generateToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
 export const registerUser = async (req, res) => {
+  const { name, email, password } = req.body;
   try {
-    const { name, email, password } = req.body;
-
-    const userExists = await User.findOne({ email });
-    if (userExists)
-      return res.status(400).json({ message: "User already exists" });
+    const exists = await User.findOne({ email });
+    if (exists) return res.status(400).json({ message: "User already exists" });
 
     const user = await User.create({ name, email, password });
-    res.status(201).json({
-      success: true,
-      user: { id: user._id, name: user.name, email: user.email },
-    });
+    return res.status(201).json({ user: { id: user._id, name: user.name, email: user.email }, token: generateToken(user._id) });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
 export const loginUser = async (req, res) => {
+  const { email, password } = req.body;
   try {
-    const { email, password } = req.body;
-
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "Invalid credentials" });
-
-    const isMatch = await user.matchPassword(password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
-
-    const token = generateToken(user._id);
-
-    res.status(200).json({
-      success: true,
-      token,
-      user: { id: user._id, name: user.name, email: user.email },
-    });
+    if (user && await user.matchPassword(password)) {
+      return res.json({ user: { id: user._id, name: user.name, email: user.email }, token: generateToken(user._id) });
+    } else {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
 export const getMe = async (req, res) => {
-  res.status(200).json({ success: true, user: req.user });
+  if (!req.user) return res.status(401).json({ message: "Not authorized" });
+  res.json({ user: req.user });
 };
