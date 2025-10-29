@@ -14,7 +14,7 @@ connectDB();
 // Allow frontend ports (CORS configuration)
 // We specify localhost:3000 (React Frontend) as the trusted origin.
 app.use(cors({
-    origin: ["http://localhost:3000", "http://localhost:3001"],
+    origin: ["http://localhost:3000", ],
     credentials: true,
     methods: ["GET","POST","PUT","DELETE","OPTIONS"]
 }));
@@ -27,7 +27,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/tasks", taskRoutes);
 
 // Health Check Endpoint
-app.get("/", (req, res) => res.send("🚀 FocusFlow API running"));
+app.get("/", (req, res) => res.send(" FocusFlow API running"));
 
 // Error handler (simple)
 app.use((err, req, res, next) => {
